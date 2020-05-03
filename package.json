@@ -1,0 +1,25 @@
+{
+  "name": "raprapesyourears",
+  "version": "1.0.0",
+  "description": "Study the evolution of the languages used into french rap lyrics.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/annelhote/RapRapesYourEars.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/annelhote/RapRapesYourEars/issues"
+  },
+  "homepage": "https://github.com/annelhote/RapRapesYourEars#readme",
+  "dependencies": {
+    "@elastic/elasticsearch": "^6.8.6",
+    "axios": "^0.19.2",
+    "cheerio": "^1.0.0-rc.3",
+    "node-fetch": "^2.6.0"
+  }
+}
