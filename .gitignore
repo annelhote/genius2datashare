@@ -1,2 +1,14 @@
+#
+# IDE files
+#
 .idea
+
+#
+# JS modules
+#
 node_modules
+
+#
+# Config file
+#
+config.json

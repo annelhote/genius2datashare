@@ -3,7 +3,9 @@ const axios = require('axios')
 const cheerio = require('cheerio')
 const es = require('@elastic/elasticsearch')
 
-const headers = { 'Authorization': 'Bearer wBSsHGD8VuHpJZdO5YAHvLq0oxG9x9oUdnmhNFqvONO7VrfCHzfOodIFpLx795ZX' }
+const config = require('./config.json')
+
+const headers = { 'Authorization': `Bearer ${config.bearer}` }
 const client = new es.Client({ node: 'http://localhost:9200' })
 const baseUrl = 'http://api.genius.com'
 
@@ -41,7 +43,7 @@ async function getLyricsFromSongId (songId) {
             const lyrics = html('div.lyrics').text()
             console.log('I got lyrics for song : ' + songId)
             await client.index({
-                index: 'lyrics-datashare',
+                index: config.esIndex,
                 type: 'doc',
                 body: {
                     content: lyrics
