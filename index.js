@@ -2,6 +2,7 @@ const _ = require('lodash')
 const axios = require('axios')
 const cheerio = require('cheerio')
 const es = require('@elastic/elasticsearch')
+const moment = require('moment')
 
 const config = require('./config.json')
 
@@ -31,30 +32,38 @@ async function getLyricsFromSongId (songId) {
     console.log('getLyricsFromSongId : ' + songId)
     const url = `${baseUrl}/songs/${songId}`;
     try {
-        const res = await axios.get(url, { headers, params: { text_format : 'plain,html' } })
-        const songPath = res.data.response.song.path
-        console.log('songPath : ' + songPath)
+        const response = await axios.get(url, { headers, params: { text_format : 'plain,html' } })
+        const song = response.data.response.song
+        const songPath = song.path
+        const songDate = song.release_date_for_display
 
         // Retrieve lyrics
         const songUrl = `http://genius.com${songPath}`
-        try {
-            const result = await axios.get(songUrl)
-            const html = cheerio.load(result.data)
-            const lyrics = html('div.lyrics').text()
-            console.log('I got lyrics for song : ' + songId)
-            await client.index({
-                index: config.esIndex,
-                type: 'doc',
-                body: {
-                    content: lyrics
-                }
-            })
-        } catch (error) {
-            console.log('ERROR 3')
-            console.log(error)
+        const result = await axios.get(songUrl)
+        const html = cheerio.load(result.data)
+        const lyrics = html('div.lyrics').text()
+        console.log('I got lyrics for song : ' + songId)
+        const body = {
+            content: lyrics,
+            type: 'Document',
+            language: 'FRENCH',
+            extractionDate: moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z',
+            metadata: {
+                tika_metadata_author: 'Benjamin Clementine',
+                tika_metadata_author_id: 263339,
+            }
         }
+        if (songDate !== null) {
+            body.metadata.tika_metadata_creation_date = moment(songDate).format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z'
+        }
+        await client.index({
+            index: config.esIndex,
+            type: 'doc',
+            id: songId,
+            body
+        })
     } catch (error) {
-        console.log('ERROR 2')
+        console.log('ERROR')
         console.log(error)
     }
 }
@@ -63,5 +72,5 @@ async function getLyricsFromSongId (songId) {
 // getLyricsFromSongId(240015)
 // Artist id : Goldman : 47263
 // Artist id : Benjamin Clementine : 263339
-getSongsFromArtistId(47263)
+getSongsFromArtistId(263339)
 
