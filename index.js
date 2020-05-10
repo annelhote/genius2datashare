@@ -10,6 +10,11 @@ const headers = { 'Authorization': `Bearer ${config.bearer}` }
 const client = new es.Client({ node: 'http://localhost:9200' })
 const baseUrl = 'http://api.genius.com'
 
+// Artist id : Jean-Jacques Goldman : 47263
+// Artist id : Benjamin Clementine : 263339
+const ARTISTE_ID = 47263
+const ARTISTE_NAME = 'Jean-Jacques Goldman'
+
 async function getSongsFromArtistId (artistId) {
     const artist_url = `${baseUrl}/artists/${artistId}/songs`
     let page = 1
@@ -45,12 +50,21 @@ async function getLyricsFromSongId (songId) {
         console.log('I got lyrics for song : ' + songId)
         const body = {
             content: lyrics,
+            contentLength: lyrics.length,
             type: 'Document',
             language: 'FRENCH',
             extractionDate: moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z',
+            nerTags: [],
+            extractionLevel: 0,
+            tags: [],
+            status: 'INDEXED',
+            contentType: 'text/plain',
+            join: {
+                name: 'Document'
+            },
             metadata: {
-                tika_metadata_author: 'Benjamin Clementine',
-                tika_metadata_author_id: 263339,
+                tika_metadata_author: ARTISTE_NAME,
+                tika_metadata_author_id: ARTISTE_ID,
             }
         }
         if (songDate !== null) {
@@ -68,9 +82,4 @@ async function getLyricsFromSongId (songId) {
     }
 }
 
-// Song id : Là bas : 240015
-// getLyricsFromSongId(240015)
-// Artist id : Goldman : 47263
-// Artist id : Benjamin Clementine : 263339
-getSongsFromArtistId(263339)
-
+getSongsFromArtistId(ARTISTE_ID)
